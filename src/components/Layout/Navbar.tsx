@@ -1,16 +1,7 @@
+import LogoSquare from "@components/LogoSquare";
+import { ConnectKitButton } from "connectkit";
 import Link from "next/link";
 import HamburgerMenu from "./HamburgerMenu";
-import dynamic from "next/dynamic";
-import LogoSquare from "@components/LogoSquare";
-
-// Default styles that can be overridden by your app
-require("@solana/wallet-adapter-react-ui/styles.css");
-
-const WalletMultiButtonDynamic = dynamic(
-  async () =>
-    (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
-  { ssr: false }
-);
 
 export default function Navbar() {
 
@@ -55,7 +46,7 @@ export default function Navbar() {
                 SuperMeets
               </div>
             </Link>
-            {/* {menu.length!=0 && (
+            {menu.length!=0 && (
               <ul className="hidden gap-6 text-sm md:flex md:items-center">
                 {menu.map((item) => (
                   <li key={item.title}>
@@ -68,10 +59,10 @@ export default function Navbar() {
                   </li>
                 ))}
               </ul>
-            )} */}
+            )}
           </div>
           <div className="flex justify-end md:w-1/3">
-            <WalletMultiButtonDynamic />
+            <ConnectKitButton/>
           </div>
         </div>
       </nav>

@@ -1,38 +1,35 @@
-import {
-  ConnectionProvider,
-  WalletProvider,
-} from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-import {
-  WalletModalProvider,
-} from "@solana/wallet-adapter-react-ui";
-import { clusterApiUrl } from "@solana/web3.js";
-import { useMemo } from "react";
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { ReactNode } from "react";
+import { WagmiConfig, createConfig } from "wagmi";
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-require("@solana/wallet-adapter-react-ui/styles.css");
+const config = createConfig(
+  getDefaultConfig({
+    // Required API Keys
+    alchemyId: process.env.ALCHEMY_ID ?? '', // provide a default value
+    walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID ?? '', // provide a default value
 
-export default function WalletContextProvider({ children }: Props) {
-  const network = WalletAdapterNetwork.Devnet;
+    // Required
+    appName: "Converse",
 
-  // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    // Optional
+    appDescription: "Your App Description",
+    appUrl: "https://family.co", // your app's url
+    appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
+  }),
+);
 
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter()],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [network]
-  );
-
+const WalletContextProvider = ({ children }: Props) => {
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <WagmiConfig config={config}>
+      <ConnectKitProvider>
+        {children}
+      </ConnectKitProvider>
+    </WagmiConfig>
   );
 }
+
+export default WalletContextProvider;
