@@ -1,19 +1,25 @@
 import { NextPage } from "next";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useAccount } from "wagmi";
 import { redis1, redis2 } from "@/utils/db";
 import createRoom from "@/huddle01/createRoom";
 import { useRouter } from "next/router";
 import { useMachingStore } from "@store/matching";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
+// interface NFTData {
+//   name: string;
+//   cached_image_uri: string;
+//   collection: {
+//     address: string;
+//   };
+// }
+
 interface NFTData {
   name: string;
-  cached_image_uri: string;
-  collection: {
-    address: string;
-  };
+  image_uri: string;
+  contract_address: string;
 }
 
 const About: NextPage = () => {
@@ -22,7 +28,7 @@ const About: NextPage = () => {
     console.log(selectedCardsList);
   }, [selectedCardsList]);
   const { push } = useRouter();
-  const { publicKey } = useWallet();
+  const { address } = useAccount();
   const addPreference = useMachingStore((state) => state.addPreference);
   const preferences = useMachingStore((state) => state.preferences);
 
@@ -44,12 +50,12 @@ const About: NextPage = () => {
     localStorage.setItem("preferences", JSON.stringify(selectedCardsList));
     for (const address of selectedCardsList) {
       const value = (await redis1.get(address)) as string[] | null;
-      if (value && publicKey) {
-        if (!value.includes(publicKey?.toBase58())) {
-          await redis1.set(address, [...value, publicKey?.toBase58()]);
+      if (value && address) {
+        if (!value.includes(address)) {
+          await redis1.set(address, [...value, address]);
         }
       } else {
-        await redis1.set(address, [publicKey?.toBase58()]);
+        await redis1.set(address, [address]);
       }
     }
     push("/loader");
@@ -57,8 +63,8 @@ const About: NextPage = () => {
 
   const mapRoomWithWallet = async () => {
     const roomId = await createRoom();
-    if (roomId && publicKey) {
-      await redis2.set(publicKey?.toBase58(), {
+    if (roomId && address) {
+      await redis2.set(address, {
         roomId: roomId,
         partner: null,
       });
@@ -71,43 +77,44 @@ const About: NextPage = () => {
 
   useEffect(() => {
     const getNFT = async () => {
-      console.log(publicKey?.toBase58());
-      const nfts = await fetch('/api/getMatchNFTs', {
-        method: 'POST',
+      console.log(address);
+      const nfts = await fetch("/api/getMatchNFTs", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          walletAddress: publicKey?.toBase58(),
+          walletAddress: address,
         }),
       }).then((res) => res.json());
       setSupportedTokenAddressesMetadata(nfts);
     };
     getNFT();
-  }, [publicKey]);
+  }, [address]);
 
   return (
-    <div className='w-full h-full flex flex-col justify-evenly items-center'>
+    <div className="w-full h-full flex flex-col justify-evenly items-center">
       <div className="w-full h-full p-5 lg:px-40 flex flex-col md:flex-row justify-evenly gap-5 sm:gap-16 items-center pt-32">
         {supportedTokenAddressesMetadata?.map((item: NFTData) => {
           return (
             <div
-              key={item.collection.address}
-              className={`w-[25vw] aspect-square flex flex-col justify-center items-center relative rounded-lg border transition-all ${selectedCardsList.includes(item.collection.address)
-                ? "border-blue-500 border-4 skew-x-6 -skew-y-3 shadow-2xl shadow-blue-700"
-                : "border-cardGray-700 hover:border-gray-700"
-                } group bg-white p-1 md:p-2`}
+              key={item.contract_address}
+              className={`w-[25vw] aspect-square flex flex-col justify-center items-center relative rounded-lg border transition-all ${
+                selectedCardsList.includes(item.contract_address)
+                  ? "border-blue-500 border-4 skew-x-6 -skew-y-3 shadow-2xl shadow-blue-700"
+                  : "border-cardGray-700 hover:border-gray-700"
+              } group bg-white p-1 md:p-2`}
               onClick={() => {
-                handleCardSelect(item.collection.address)
+                handleCardSelect(item.contract_address);
                 addPreference({
-                  address: item.collection.address,
-                  imageUri: item.cached_image_uri,
-                })
+                  address: item.contract_address,
+                  imageUri: item.image_uri,
+                });
               }}
             >
               <div className="relative w-full h-full overflow-clip">
                 <Image
-                  src={item.cached_image_uri}
+                  src={item.image_uri}
                   alt="Logo"
                   loader={({ src }) => src}
                   fill
@@ -115,7 +122,9 @@ const About: NextPage = () => {
                   className="group-hover:scale-125 rounded-lg transition-transform duration-75 object-cover"
                 />
               </div>
-              <span className="text-black text-sm md:text-xl bg-white font-bold pt-1 md:pt-2">{item.name}</span>
+              <span className="text-black text-sm md:text-xl bg-white font-bold pt-1 md:pt-2">
+                {item.name}
+              </span>
             </div>
           );
         })}
