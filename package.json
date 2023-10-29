@@ -9,9 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@huddle01/react": "1.0.0-alpha.31",
+    "@huddle01/server-sdk": "1.0.0-alpha.4",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
-    "@huddle01/react": "^0.0.16",
     "@splinetool/react-spline": "^2.2.6",
     "@splinetool/runtime": "^0.9.480",
     "@upstash/redis": "^1.23.3",

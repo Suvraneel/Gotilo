@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const VideoElem = ({ track }: { track: MediaStreamTrack }) => {
+const VideoElem = ({ track }: { track: MediaStreamTrack | null }) => {
   const getStream = (_track: MediaStreamTrack) => {
     const stream = new MediaStream();
     stream.addTrack(_track);
