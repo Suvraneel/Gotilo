@@ -45,17 +45,23 @@ const About: NextPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (address) {
+      console.log(address);
+    }
+  }, [address]);
+
   const handleSubmit = async () => {
     await mapRoomWithWallet();
     localStorage.setItem("preferences", JSON.stringify(selectedCardsList));
-    for (const address of selectedCardsList) {
-      const value = (await redis1.get(address)) as string[] | null;
+    for (const nftAddress of selectedCardsList) {
+      const value = (await redis1.get(nftAddress)) as string[] | null;
       if (value && address) {
         if (!value.includes(address)) {
-          await redis1.set(address, [...value, address]);
+          await redis1.set(nftAddress, [...value, address]);
         }
       } else {
-        await redis1.set(address, [address]);
+        await redis1.set(nftAddress, [address]);
       }
     }
     push("/loader");
