@@ -6,6 +6,13 @@ interface APIData {
   data: any;
 }
 
+interface tokenAPIData {
+  code: number;
+  message: string;
+  data: any;
+  count: number;
+}
+
 interface NFTData {
   name: string;
   image_uri: string;
@@ -18,6 +25,11 @@ const testingAddresses = [
 ];
 
 const collections = [
+  {
+    collection_name: "Devs For Revolution",
+    collection_address: "0x25ed58c027921E14D86380eA2646E3a1B5C55A8b",
+    collection_chain_id: 1,
+  },
   {
     collection_name: "DeGods",
     collection_address: "0x8821bee2ba0df28761afff119d66390d594cd280",
@@ -64,7 +76,7 @@ interface collectionData {
 const matchNFTs = async (req: NextApiRequest, res: NextApiResponse) => {
   // const address = "2pgp7NaXWqycNJ7kaFF9uvs2MQ1hd3dG2Gh27VUUzxcA";
   // const { walletAddress } = req.body;
-  const walletAddress = "0x7Df70b612040c682d1cb2e32017446e230FcD747";
+  const walletAddress = "0x4aB65FEb7Dc1644Cabe45e00e918815D3acbFa0a";
 
   const chain_id = 1;
   // const url = "https://api.shyft.to/sol/v1/nft/read_all?network=mainnet-beta&address=" + walletAddress;
@@ -91,6 +103,23 @@ const matchNFTs = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     });
   });
+
+  // check if the person has Developer Dao Tokens 400
+
+  const tokenURL = `https://api.chainbase.online/v1/account/tokens?chain_id=1&address=${walletAddress}&contract_address=0xb24cd494faE4C180A89975F1328Eab2a7D5d8f11&limit=20&page=1`;
+
+  const tokenResponse = await fetch(tokenURL, {
+    headers: {
+      "X-API-KEY": process.env.CHAINBASE_API_KEY ?? "",
+    },
+  });
+
+  const tokenData = (await tokenResponse.json()) as tokenAPIData;
+  // console.log("tokenData", tokenData);
+  const tokenBalanceInHex = tokenData.data[0].balance;
+  const tokenBalance = parseInt(tokenBalanceInHex, 16) / 10 ** 18;
+
+  console.log("tokenBalance", tokenBalance);
 
   // //remove nfts with same collection address
   // filteredNFTs = filteredNFTs?.filter(
