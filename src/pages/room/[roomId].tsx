@@ -19,7 +19,7 @@ import { redis2 } from "@utils/db";
 import { AccessToken } from "@huddle01/server-sdk/auth";
 import PeerData from "@components/PeerData";
 import { InferGetServerSidePropsType } from "next";
-import ShowPeers from "@components/ShowPeers";
+import dynamic from "next/dynamic";
 
 type IRoleEnum =
   | "host"
@@ -42,6 +42,10 @@ interface roomData {
   roomId: string | null;
   partner: string | null;
 }
+
+const ShowPeers = dynamic(() => import("@components/ShowPeers"), {
+  ssr: false,
+});
 
 export const getServerSideProps = async (context: any) => {
   const { roomId } = context.query;
@@ -129,11 +133,6 @@ const Home = ({
       });
     }
   }, []);
-
-  useEffect(() => {
-    console.log("state", state);
-    console.log("peerIds", peerIds);
-  }, [state, peerIds]);
 
   // useEventListener("room:me-left", async () => {
   //   let getRecord = (await redis2.get(

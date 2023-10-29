@@ -87,10 +87,14 @@ const About: NextPage = () => {
           walletAddress: address,
         }),
       }).then((res) => res.json());
-      setSupportedTokenAddressesMetadata(nfts);
+      setSupportedTokenAddressesMetadata(nfts.nfts);
     };
     getNFT();
   }, [address]);
+
+  useEffect(() => {
+    console.log(supportedTokenAddressesMetadata);
+  }, [supportedTokenAddressesMetadata]);
 
   return (
     <div className="w-full h-full flex flex-col justify-evenly items-center">
@@ -128,6 +132,35 @@ const About: NextPage = () => {
             </div>
           );
         })}
+                    <div
+              key={1}
+              className={`w-[25vw] aspect-square flex flex-col justify-center items-center relative rounded-lg border transition-all ${
+                selectedCardsList.includes("0xb24cd494faE4C180A89975F1328Eab2a7D5d8f11")
+                  ? "border-blue-500 border-4 skew-x-6 -skew-y-3 shadow-2xl shadow-blue-700"
+                  : "border-cardGray-700 hover:border-gray-700"
+              } group bg-white p-1 md:p-2`}
+              onClick={() => {
+                handleCardSelect("0xb24cd494faE4C180A89975F1328Eab2a7D5d8f11");
+                addPreference({
+                  address: "0xb24cd494faE4C180A89975F1328Eab2a7D5d8f11",
+                  imageUri: "https://yt3.googleusercontent.com/Bh5YI5IVd53atK2LaTUudu3hqyrJNL8SSUa3DTWOlmtW69qcE9V5wZmAoNLrHKhNvltKB4rZDQ=s900-c-k-c0x00ffffff-no-rj",
+                });
+              }}
+            >
+              <div className="relative w-full h-full overflow-clip">
+                <Image
+                  src={"https://yt3.googleusercontent.com/Bh5YI5IVd53atK2LaTUudu3hqyrJNL8SSUa3DTWOlmtW69qcE9V5wZmAoNLrHKhNvltKB4rZDQ=s900-c-k-c0x00ffffff-no-rj"}
+                  alt="Logo"
+                  loader={({ src }) => src}
+                  fill
+                  loading="lazy"
+                  className="group-hover:scale-125 rounded-lg transition-transform duration-75 object-cover"
+                />
+              </div>
+              <span className="text-black text-sm md:text-xl bg-white font-bold pt-1 md:pt-2">
+                Dev DAO
+              </span>
+            </div>
       </div>
       <button
         type="button"

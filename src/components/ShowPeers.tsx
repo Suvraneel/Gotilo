@@ -4,13 +4,18 @@ import {
   useLocalVideo,
   usePeerIds,
   useRoom,
+  useHuddle01,
 } from "@huddle01/react/hooks";
 import { FC, useEffect, useState } from "react";
-import PeerData from "./PeerData";
 import clsx from "clsx";
 import VideoElem from "./Video";
 import Image from "next/image";
 import { BasicIcons } from "./BasicIcons";
+import dynamic from "next/dynamic";
+
+const PeerData = dynamic(() => import("./PeerData"), {
+  ssr: false,
+});
 
 interface ShowPeersProps {
   displayName: string | undefined;
@@ -25,8 +30,23 @@ const ShowPeers: FC<ShowPeersProps> = ({
   camTrack,
   isVideoOn,
 }) => {
+  // const { peerIds } = usePeerIds();
 
-  const { peerIds } = usePeerIds();
+  const { state } = useRoom();
+  const [peerIds, setPeerIds] = useState<string[]>([]);
+
+  const { huddleClient } = useHuddle01();
+
+  useEffect(() => {
+    console.log("peers", huddleClient.room.remotePeers);
+    let ids: string[] = [];
+    huddleClient.room.remotePeers.forEach((peer) => {
+      ids.push(peer.peerId);
+      console.log("peers", peer.peerId);
+    });
+    console.log("ids", ids);
+    setPeerIds(ids);
+  }, [huddleClient]);
 
   return (
     <div className="my-5 flex h-[75vh] items-center justify-center self-stretch">
@@ -60,7 +80,6 @@ const ShowPeers: FC<ShowPeersProps> = ({
             {BasicIcons.ping}
           </div>
         </div>
-
         {Object.values(peerIds).length > 0 &&
           peerIds.map((peerId) => <PeerData peerId={peerId} />)}
       </div>

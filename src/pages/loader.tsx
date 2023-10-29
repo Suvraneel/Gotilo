@@ -1,10 +1,10 @@
 import { redis1, redis2 } from "@utils/db";
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import { useMachingStore } from "@store/matching";
 import { useMeetPersistStore } from "@store/meet";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 
 interface PreferenceNFT {
   imageUri: string;
@@ -25,7 +25,7 @@ const Loader = () => {
     setMatchedPFP,
     matchedPFP,
   } = useMachingStore();
-  const { publicKey } = useWallet();
+  const { address } = useAccount();
   const { push } = useRouter();
   const setAvatarUrl = useMeetPersistStore((state) => state.setAvatarUrl);
 
@@ -57,7 +57,7 @@ const Loader = () => {
       let counter = 0;
       const startMatching = async () => {
         const checkIfRoomExists = (await redis2.get(
-          publicKey?.toBase58() as string
+          address as string
         )) as RoomsInterface | null;
 
         if (
@@ -73,7 +73,7 @@ const Loader = () => {
         console.log("The addresses in the pool", value);
 
         const availablePartners = value?.filter(
-          (item) => item !== publicKey?.toBase58()
+          (item) => item !== address
         );
 
         if (availablePartners) {
@@ -92,17 +92,17 @@ const Loader = () => {
 
             await redis1.set(preferredMatchNFT, restAddresses);
 
-            const roomId = await redis2.get(publicKey?.toBase58() as string);
+            const roomId = await redis2.get(address as string);
 
             setMatchedRoomId((roomId as RoomsInterface).roomId);
 
             await redis2.set(roomPartner, {
               roomId: (roomId as RoomsInterface).roomId,
-              partner: publicKey?.toBase58(),
+              partner: address,
               pfp: imageUrl,
             });
 
-            await redis2.set(publicKey?.toBase58() as string, {
+            await redis2.set(address as string, {
               roomId: (roomId as RoomsInterface).roomId,
               partner: roomPartner,
               pfp: matchedPFP,

@@ -65,6 +65,11 @@ const collections = [
     collection_address: "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
     collection_chain_id: 1,
   },
+  {
+    collection_name: "Gotilo",
+    collection_address: "0x676E56b7Ee7dd94E0AccfB78Ec569B9180844F94",
+    collection_chain_id: 137,
+  }
 ] as collectionData[];
 
 interface collectionData {
@@ -75,8 +80,7 @@ interface collectionData {
 
 const matchNFTs = async (req: NextApiRequest, res: NextApiResponse) => {
   // const address = "2pgp7NaXWqycNJ7kaFF9uvs2MQ1hd3dG2Gh27VUUzxcA";
-  // const { walletAddress } = req.body;
-  const walletAddress = "0x4aB65FEb7Dc1644Cabe45e00e918815D3acbFa0a";
+  const { walletAddress } = req.body;
 
   const chain_id = 1;
   // const url = "https://api.shyft.to/sol/v1/nft/read_all?network=mainnet-beta&address=" + walletAddress;
@@ -90,7 +94,7 @@ const matchNFTs = async (req: NextApiRequest, res: NextApiResponse) => {
   const data = (await response.json()) as APIData;
   const nfts: NFTData[] = data.data;
 
-  const filteredNFTs = nfts.filter((nft: any) => {
+  let filteredNFTs = nfts.filter((nft: any) => {
     return collections.some((collection) => {
       if (nft.contract_address === collection.collection_address) {
         console.log(
@@ -119,19 +123,19 @@ const matchNFTs = async (req: NextApiRequest, res: NextApiResponse) => {
   const tokenBalanceInHex = tokenData.data[0].balance;
   const tokenBalance = parseInt(tokenBalanceInHex, 16) / 10 ** 18;
 
-  console.log("tokenBalance", tokenBalance);
+  
 
   // //remove nfts with same collection address
-  // filteredNFTs = filteredNFTs?.filter(
-  //   (nft: NFTData, index: number, self: NFTData[]) =>
-  //     index ===
-  //     self.findIndex((t) => t.collection.address === nft.collection.address)
-  // );
+  filteredNFTs = filteredNFTs?.filter(
+    (nft: NFTData, index: number, self: NFTData[]) =>
+      index ===
+      self.findIndex((t) => t.contract_address === nft.contract_address)
+  );
 
-  // if (!filteredNFTs) {
-  //   return res.status(404).json({ message: "No NFTs found" });
-  // }
-  // return res.status(200).json(filteredNFTs);
+  if (!filteredNFTs) {
+    return res.status(404).json({ message: "No NFTs found" });
+  }
+  return res.status(200).json({ nfts: filteredNFTs, devdao: tokenBalance >= 400 ? true : false });
 };
 
 export default matchNFTs;
