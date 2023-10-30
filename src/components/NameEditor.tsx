@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { BasicIcons } from "./BasicIcons";
 import { useLocalPeer } from "@huddle01/react/hooks";
 import { useEnsName, useEnsAvatar, useAccount } from "wagmi";
+import { publicClient } from "@utils/client";
+import { normalize } from "viem/ens";
 
 interface Props {
   displayName: string;
@@ -17,9 +19,12 @@ const NameEditor: React.FC<Props> = ({ displayName }) => {
     address: address as `0x${string}`,
   });
 
-  const { data: ensAvatar } = useEnsAvatar({
-    name: ens,
-  });
+  const getEnsAvatar = async () => {
+    const ensText = await publicClient.getEnsAvatar({
+      name: normalize(ens as string),
+    });
+    return ensText;
+  };
 
   const { updateMetadata } = useLocalPeer<{
     displayName: string;
@@ -30,10 +35,10 @@ const NameEditor: React.FC<Props> = ({ displayName }) => {
     setIsEditing(true);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     updateMetadata({
       displayName: editedDisplayName,
-      avatarUrl: ensAvatar ?? "/4.png",
+      avatarUrl: (await getEnsAvatar()) ?? "/4.png",
     });
     setIsEditing(false);
   };
@@ -57,12 +62,20 @@ const NameEditor: React.FC<Props> = ({ displayName }) => {
             onChange={handleInputChange}
             disabled={!isEditing}
           />
-          <div onClick={handleSaveClick}>{BasicIcons.save}</div>
+          <div
+            onClick={async () => {
+              await handleSaveClick();
+            }}
+          >
+            {BasicIcons.save}
+          </div>
           {BasicIcons.ping}
         </div>
       ) : (
         <div className="w-full truncate flex justify-start  items-center gap-2">
-          <span className="w-28">{`${editedDisplayName ?? "Gotilo"} (You)` ?? "Gotilo (You)"}</span>
+          <span className="w-28">
+            {`${editedDisplayName ?? "Gotilo"} (You)` ?? "Gotilo (You)"}
+          </span>
           <div className="flex justify-start items-center">
             <div onClick={handleEditClick}>{BasicIcons.pencil}</div>
             <div className="w-6 h-6">{BasicIcons.ping}</div>

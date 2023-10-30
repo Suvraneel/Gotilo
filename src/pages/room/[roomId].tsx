@@ -107,7 +107,7 @@ const Home = ({
 
   const getEnsAvatar = async () => {
     const ensText = await publicClient.getEnsAvatar({
-      name: normalize('wagmi-dev.eth'),
+      name: normalize(ens as string),
     });
     return ensText;
   };
