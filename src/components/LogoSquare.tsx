@@ -5,8 +5,8 @@ const LogoSquare = (props: any) => {
     return (
         <div className={props.className}>
             <Image
-                src={'/Supermeet.png'}
-                alt="Supermeet Logo"
+                src={'/GoTilo.png'}
+                alt="GoTilo Logo"
                 fill
                 className='object-contain w-full h-full'
             />
