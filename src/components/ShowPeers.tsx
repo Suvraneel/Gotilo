@@ -55,7 +55,7 @@ const ShowPeers: FC<ShowPeersProps> = ({
               />
             </div>
           )}
-          <NameEditor displayName={displayName??"Guest"}/>
+          <NameEditor displayName={displayName??"You"}/>
         </div>
         {Object.values(peerIds).length > 0 &&
           peerIds.map((peerId) => <PeerData key={peerId} peerId={peerId} />)}
