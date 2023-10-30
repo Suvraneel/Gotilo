@@ -12,6 +12,7 @@ import VideoElem from "./Video";
 import Image from "next/image";
 import { BasicIcons } from "./BasicIcons";
 import dynamic from "next/dynamic";
+import NameEditor from "./NameEditor";
 
 const PeerData = dynamic(() => import("./PeerData"), {
   ssr: false,
@@ -60,13 +61,10 @@ const ShowPeers: FC<ShowPeersProps> = ({
               />
             </div>
           )}
-          <div className="bg-black text-slate-100 absolute bottom-1 left-1 rounded-md py-1 px-2 font-lg flex gap-2">
-            {`${displayName} (You)`}
-            {BasicIcons.ping}
-          </div>
+          <NameEditor displayName={displayName??"Guest"}/>
         </div>
         {Object.values(peerIds).length > 0 &&
-          peerIds.map((peerId) => <PeerData peerId={peerId} />)}
+          peerIds.map((peerId) => <PeerData key={peerId} peerId={peerId} />)}
       </div>
     </div>
   );

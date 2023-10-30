@@ -109,7 +109,7 @@ const Home = ({
 
   const { peerIds } = usePeerIds();
 
-  const { metadata, updateMetadata } = useLocalPeer<{
+  const { metadata, peerId, updateMetadata } = useLocalPeer<{
     displayName: string;
     avatarUrl: string;
   }>();
@@ -166,7 +166,7 @@ const Home = ({
         token: userToken,
       });
     }
-  }, []);
+  }, [joinRoom, roomId, userToken]);
 
   useEffect(() => {
     setCamPrefferedDevice(videoDevice.deviceId);
