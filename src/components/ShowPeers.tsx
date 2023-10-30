@@ -55,7 +55,9 @@ const ShowPeers: FC<ShowPeersProps> = ({
               />
             </div>
           )}
-          <NameEditor displayName={displayName??"You"}/>
+          <div className="flex">
+          <NameEditor displayName={`${displayName ?? 'Gotilo'}`}/>
+          </div>
         </div>
         {Object.values(peerIds).length > 0 &&
           peerIds.map((peerId) => <PeerData key={peerId} peerId={peerId} />)}
