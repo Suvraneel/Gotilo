@@ -153,11 +153,11 @@ const Home = ({
     },
   });
 
-  useEffect(() => {
-    huddleClient.room.on("peer-left", () => {
-      window.location.href = "/";
-    });
-  }, [huddleClient.room]);
+  // useEffect(() => {
+  //   huddleClient.room.on("peer-left", () => {
+  //     window.location.href = "/";
+  //   });
+  // }, [huddleClient.room]);
 
   useEffect(() => {
     if (userToken) {
@@ -166,7 +166,7 @@ const Home = ({
         token: userToken,
       });
     }
-  }, [joinRoom, roomId, userToken]);
+  }, [userToken]);
 
   useEffect(() => {
     setCamPrefferedDevice(videoDevice.deviceId);
