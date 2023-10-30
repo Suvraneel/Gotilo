@@ -23,6 +23,8 @@ import PeerData from "@components/PeerData";
 import { InferGetServerSidePropsType } from "next";
 import dynamic from "next/dynamic";
 import { useEnsName, useAccount, useEnsAvatar } from "wagmi";
+import { normalize } from 'viem/ens'
+import { publicClient } from "@utils/client";
 
 type IRoleEnum =
   | "host"
@@ -103,9 +105,12 @@ const Home = ({
     address: address,
   });
 
-  const { data: avatar } = useEnsAvatar({
-    name: ens,
-  });
+  const getEnsAvatar = async () => {
+    const ensText = await publicClient.getEnsAvatar({
+      name: normalize('wagmi-dev.eth'),
+    });
+    return ensText;
+  };
 
   const { peerIds } = usePeerIds();
 
@@ -138,10 +143,10 @@ const Home = ({
   } = useMeetPersistStore();
 
   const { joinRoom, state } = useRoom({
-    onJoin: () => {
+    onJoin: async () => {
       updateMetadata({
         displayName: ens || "Gotilo",
-        avatarUrl: avatar || "/4.png",
+        avatarUrl: await getEnsAvatar() || "/4.png",
       });
     },
     onLeave: async () => {
