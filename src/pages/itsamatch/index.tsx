@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { redis2 } from "@utils/db";
 import { useMeetPersistStore } from "@store/meet";
 import { useMachingStore } from "@store/matching";
+import { useEnsName, useEnsAvatar, useAccount } from "wagmi";
 
 interface RoomsDataInterface {
   roomId: string;
@@ -19,19 +20,31 @@ const ItsAMatch = () => {
   const avatarUrl = useMeetPersistStore((state) => state.avatarUrl);
   const matchedAddress = useMachingStore((state) => state.matchedAddress);
   const roomId = useMachingStore((state) => state.matchedRoomId);
-  const [partnerAvatarUrl, setPartnerAvatarUrl] = useState<string>("");
+
+  const { address } = useAccount();
+
+  const { data: myEns } = useEnsName({
+    address: address as `0x${string}`,
+  });
+
+  const { data: partnerEns } = useEnsName({
+    address: matchedAddress as `0x${string}`,
+  });
+
+  const { data: myEnsAvatar } = useEnsAvatar({
+    name: myEns,
+  });
+
+  const { data: partnerEnsAvatar } = useEnsAvatar({
+    name: partnerEns,
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await redis2.get(matchedAddress);
-      if (data) {
-        setPartnerAvatarUrl((data as RoomsDataInterface).pfp || "");
-      }
-    };
-    fetchData();
-    setTimeout(() => {
-      push(`/room/${roomId}`)
-    }, 7500);
+    if (roomId) {
+      setTimeout(() => {
+        push(`/room/${roomId}`);
+      }, 5000);
+    }
   }, []);
 
   return (
@@ -43,7 +56,7 @@ const ItsAMatch = () => {
           <div className="flex justify-evenly items-center w-full h-full relative">
             <div className="w-1/3 aspect-square relative">
               <Image
-                src={avatarUrl}
+                src={myEnsAvatar || "/4.png"}
                 loader={({ src }) => src}
                 alt="itsamatch"
                 fill
@@ -53,7 +66,7 @@ const ItsAMatch = () => {
             <h1 className={`text-8xl font-thin ${styles.stamp}`}>X</h1>
             <div className="w-1/3 aspect-square relative">
               <Image
-                src={partnerAvatarUrl.length > 0 ? partnerAvatarUrl : "/default-avatar.svg"} 
+                src={myEnsAvatar || "/4.png"}
                 loader={({ src }) => src}
                 alt="itsamatch"
                 fill

@@ -64,7 +64,9 @@ const Loader = () => {
           checkIfRoomExists?.partner !== null &&
           checkIfRoomExists?.roomId !== null
         ) {
-          push(`/room/${checkIfRoomExists?.roomId}`);
+          setMatchedRoomId(checkIfRoomExists?.roomId as string);
+          setMatchedAddress(checkIfRoomExists?.partner as string);
+          push(`room/${checkIfRoomExists?.roomId}`);
           return;
         }
 

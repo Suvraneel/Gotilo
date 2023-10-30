@@ -6,6 +6,9 @@ import {
   useLocalPeer,
   useRoom,
   usePeerIds,
+  useLocalMedia,
+  useDevices,
+  useHuddle01,
 } from "@huddle01/react/hooks";
 import clsx from "clsx";
 import { useMeetPersistStore } from "@/store/meet";
@@ -94,6 +97,8 @@ const Home = ({
   const { leaveRoom } = useRoom();
   const { address } = useAccount();
 
+  const { huddleClient } = useHuddle01();
+
   const { data: ens, isError } = useEnsName({
     address: address,
   });
@@ -113,6 +118,25 @@ const Home = ({
 
   const { track: mic, isAudioOn, enableAudio, disableAudio } = useLocalAudio();
 
+  const { setPreferredDevice: setCamPrefferedDevice } = useDevices({
+    type: "cam",
+  });
+
+  const { setPreferredDevice: setAudioPrefferedDevice } = useDevices({
+    type: "mic",
+  });
+
+  const { fetchStream } = useLocalMedia();
+
+  const {
+    isMicMuted,
+    isCamOff,
+    toggleMicMuted,
+    toggleCamOff,
+    videoDevice,
+    audioInputDevice,
+  } = useMeetPersistStore();
+
   const { joinRoom, state } = useRoom({
     onJoin: () => {
       updateMetadata({
@@ -129,14 +153,11 @@ const Home = ({
     },
   });
 
-  const {
-    isMicMuted,
-    isCamOff,
-    toggleMicMuted,
-    toggleCamOff,
-    videoDevice,
-    audioInputDevice,
-  } = useMeetPersistStore();
+  useEffect(() => {
+    huddleClient.room.on("peer-left", () => {
+      window.location.href = "/";
+    });
+  }, [huddleClient.room]);
 
   useEffect(() => {
     if (userToken) {
@@ -146,6 +167,42 @@ const Home = ({
       });
     }
   }, []);
+
+  useEffect(() => {
+    setCamPrefferedDevice(videoDevice.deviceId);
+    if (isVideoOn) {
+      disableVideo();
+      const changeVideo = async () => {
+        const { stream } = await fetchStream({
+          mediaDeviceKind: "cam",
+        });
+        if (stream) {
+          enableVideo(stream);
+        }
+      };
+      changeVideo();
+    }
+  }, [videoDevice]);
+
+  useEffect(() => {
+    setAudioPrefferedDevice(audioInputDevice.deviceId);
+    if (isAudioOn) {
+      disableAudio();
+      const changeAudio = async () => {
+        const { stream } = await fetchStream({
+          mediaDeviceKind: "mic",
+        });
+        if (stream) {
+          enableAudio(stream);
+        }
+      };
+      changeAudio();
+    }
+  }, [audioInputDevice]);
+
+  useEffect(() => {
+    setAudioPrefferedDevice(audioInputDevice.deviceId);
+  }, [audioInputDevice]);
 
   // useEventListener("room:me-left", async () => {
   //   let getRecord = (await redis2.get(
@@ -163,73 +220,89 @@ const Home = ({
 
   return (
     <>
-      <ShowPeers
-        displayName={metadata?.displayName}
-        avatarUrl={metadata?.avatarUrl}
-        camTrack={cam}
-        isVideoOn={isVideoOn}
-      />
-      <div className="flex items-center justify-center self-stretch">
-        <div className="flex w-full flex-row items-center justify-center gap-8">
-          {!isVideoOn ? (
-            <button
-              type="button"
-              onClick={() => {
-                enableVideo();
-              }}
-              className="bg-brand-500 hover:bg-white/20 flex h-10 w-10 items-center justify-center rounded-xl"
-            >
-              {BasicIcons.inactive["cam"]}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                disableVideo();
-              }}
-              className={clsx(
-                "flex h-10 w-10 items-center bg-gray-800 hover:bg-white/20 justify-center rounded-xl"
+      {peerIds.length > 0 ? (
+        <>
+          {" "}
+          <ShowPeers
+            displayName={metadata?.displayName}
+            avatarUrl={metadata?.avatarUrl}
+            camTrack={cam}
+            isVideoOn={isVideoOn}
+          />
+          <div className="flex items-center justify-center self-stretch">
+            <div className="flex w-full flex-row items-center justify-center gap-8">
+              {!isVideoOn ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    enableVideo();
+                  }}
+                  className="bg-brand-500 hover:bg-white/20 flex h-10 w-10 items-center justify-center rounded-xl"
+                >
+                  {BasicIcons.inactive["cam"]}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    disableVideo();
+                  }}
+                  className={clsx(
+                    "flex h-10 w-10 items-center bg-gray-800 hover:bg-white/20 justify-center rounded-xl"
+                  )}
+                >
+                  {BasicIcons.active["cam"]}
+                </button>
               )}
-            >
-              {BasicIcons.active["cam"]}
-            </button>
-          )}
-          {!isAudioOn ? (
-            <button
-              type="button"
-              onClick={() => {
-                enableAudio();
-              }}
-              className="bg-brand-500 hover:bg-white/20 flex h-10 w-10 items-center justify-center rounded-xl"
-            >
-              {BasicIcons.inactive["mic"]}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                disableAudio();
-              }}
-              className={clsx(
-                "flex h-10 w-10 items-center bg-gray-800 hover:bg-white/20 justify-center rounded-xl"
+              {!isAudioOn ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    enableAudio();
+                  }}
+                  className="bg-brand-500 hover:bg-white/20 flex h-10 w-10 items-center justify-center rounded-xl"
+                >
+                  {BasicIcons.inactive["mic"]}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    disableAudio();
+                  }}
+                  className={clsx(
+                    "flex h-10 w-10 items-center bg-gray-800 hover:bg-white/20 justify-center rounded-xl"
+                  )}
+                >
+                  {BasicIcons.active["mic"]}
+                </button>
               )}
-            >
-              {BasicIcons.active["mic"]}
-            </button>
-          )}
-          <SwitchDeviceMenu />
-          <button
-            type="button"
-            onClick={() => {
-              leaveRoom();
-              window.close();
-            }}
-            className="bg-red-500 hover:bg-red-500/50 flex h-10 w-10 items-center justify-center rounded-xl"
-          >
-            {BasicIcons.close}
-          </button>
+              <SwitchDeviceMenu />
+              <button
+                type="button"
+                onClick={() => {
+                  leaveRoom();
+                  window.close();
+                }}
+                className="bg-red-500 hover:bg-red-500/50 flex h-10 w-10 items-center justify-center rounded-xl"
+              >
+                {BasicIcons.close}
+              </button>
+            </div>
+          </div>{" "}
+        </>
+      ) : (
+        <div className="flex flex-col h-screen w-screen justify-center items-center">
+          <Image
+            width={100}
+            height={90}
+            src={"/loader.gif"}
+            className="w-1/2 aspect-auto"
+            alt="loading"
+          />
+          <span className="text-2xl">Wait until your room partner joins ...</span>
         </div>
-      </div>
+      )}
     </>
   );
 };
