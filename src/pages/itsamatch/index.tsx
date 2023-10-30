@@ -36,6 +36,7 @@ const ItsAMatch = () => {
   });
 
   const getMyEnsAvatar = async () => {
+    if (!myEns) return null;
     const ensText = await publicClient.getEnsAvatar({
       name: normalize(myEns as string),
     });
@@ -43,6 +44,7 @@ const ItsAMatch = () => {
   };
 
   const getPartnerEnsAvatar = async () => {
+    if (!partnerEns) return null;
     const ensText = await publicClient.getEnsAvatar({
       name: normalize(partnerEns as string),
     });

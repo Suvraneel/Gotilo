@@ -106,6 +106,7 @@ const Home = ({
   });
 
   const getEnsAvatar = async () => {
+    if (!ens) return null;
     const ensText = await publicClient.getEnsAvatar({
       name: normalize(ens as string),
     });
