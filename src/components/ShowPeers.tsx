@@ -30,23 +30,8 @@ const ShowPeers: FC<ShowPeersProps> = ({
   camTrack,
   isVideoOn,
 }) => {
-  // const { peerIds } = usePeerIds();
 
-  const { state } = useRoom();
-  const [peerIds, setPeerIds] = useState<string[]>([]);
-
-  const { huddleClient } = useHuddle01();
-
-  useEffect(() => {
-    console.log("peers", huddleClient.room.remotePeers);
-    let ids: string[] = [];
-    huddleClient.room.remotePeers.forEach((peer) => {
-      ids.push(peer.peerId);
-      console.log("peers", peer.peerId);
-    });
-    console.log("ids", ids);
-    setPeerIds(ids);
-  }, [huddleClient]);
+  const { peerIds } = usePeerIds();
 
   return (
     <div className="my-5 flex h-[75vh] items-center justify-center self-stretch">
@@ -76,7 +61,7 @@ const ShowPeers: FC<ShowPeersProps> = ({
             </div>
           )}
           <div className="bg-black text-slate-100 absolute bottom-1 left-1 rounded-md py-1 px-2 font-lg flex gap-2">
-            {displayName ? displayName : "Guest"}
+            {`${displayName} (You)`}
             {BasicIcons.ping}
           </div>
         </div>

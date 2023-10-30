@@ -10,7 +10,6 @@ import {
 import clsx from "clsx";
 import { useMeetPersistStore } from "@/store/meet";
 
-import AudioElem from "@components/Audio";
 import { BasicIcons } from "@components/BasicIcons";
 import SwitchDeviceMenu from "@components/SwitchDeviceMenu";
 import VideoElem from "@components/Video";
@@ -20,6 +19,7 @@ import { AccessToken } from "@huddle01/server-sdk/auth";
 import PeerData from "@components/PeerData";
 import { InferGetServerSidePropsType } from "next";
 import dynamic from "next/dynamic";
+import { useEnsName, useAccount, useEnsAvatar } from "wagmi";
 
 type IRoleEnum =
   | "host"
@@ -92,6 +92,15 @@ const Home = ({
   const { push, query } = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { leaveRoom } = useRoom();
+  const { address } = useAccount();
+
+  const { data: ens, isError } = useEnsName({
+    address: address,
+  });
+
+  const { data: avatar } = useEnsAvatar({
+    name: ens,
+  });
 
   const { peerIds } = usePeerIds();
 
@@ -107,11 +116,15 @@ const Home = ({
   const { joinRoom, state } = useRoom({
     onJoin: () => {
       updateMetadata({
-        displayName: `Guest ${peerIds.length + 1}`,
-        avatarUrl: "/avatar.png",
+        displayName: ens || "Gotilo",
+        avatarUrl: "/4.png" || avatar,
       });
     },
-    onLeave: () => {
+    onLeave: async () => {
+      let getRecord = (await redis2.get(address as string)) as roomData;
+      getRecord.partner = null;
+      getRecord.roomId = null;
+      await redis2.set(address as string, getRecord);
       window.location.href = "/";
     },
   });
@@ -150,7 +163,12 @@ const Home = ({
 
   return (
     <>
-      <ShowPeers displayName={metadata?.displayName} avatarUrl={metadata?.avatarUrl} camTrack={cam} isVideoOn={isVideoOn} />
+      <ShowPeers
+        displayName={metadata?.displayName}
+        avatarUrl={metadata?.avatarUrl}
+        camTrack={cam}
+        isVideoOn={isVideoOn}
+      />
       <div className="flex items-center justify-center self-stretch">
         <div className="flex w-full flex-row items-center justify-center gap-8">
           {!isVideoOn ? (
