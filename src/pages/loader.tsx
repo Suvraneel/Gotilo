@@ -28,8 +28,6 @@ const Loader = () => {
   const { address } = useAccount();
   const { push } = useRouter();
   const setAvatarUrl = useMeetPersistStore((state) => state.setAvatarUrl);
-  const isMatched = useMeetPersistStore((state) => state.isMatched);
-  const setisMatched = useMeetPersistStore((state) => state.setIsMatched);
 
   const getPreferredMatchNFT = async (preferences: string[]) => {
     let maxPreference: string | null = null;
@@ -64,13 +62,11 @@ const Loader = () => {
 
         if (
           checkIfRoomExists?.partner !== null &&
-          checkIfRoomExists?.roomId !== null &&
-          !isMatched
+          checkIfRoomExists?.roomId !== null
         ) {
           setMatchedRoomId(checkIfRoomExists?.roomId as string);
           setMatchedAddress(checkIfRoomExists?.partner as string);
-          push('/itsamatch');
-          setisMatched(true);
+          push(`/room/${checkIfRoomExists?.roomId}`);
           return;
         }
 
@@ -82,7 +78,7 @@ const Loader = () => {
           (item) => item !== address
         );
 
-        if (availablePartners && !isMatched) {
+        if (availablePartners) {
           const roomPartner = availablePartners[0];
 
           if (roomPartner) {
@@ -117,8 +113,7 @@ const Loader = () => {
             console.log("We are still here");
 
             if ((roomId as RoomsInterface).roomId !== null) {
-              push(`/itsamatch`);
-              setisMatched(true);
+              push(`room/${(roomId as RoomsInterface).roomId}`);
               return;
             }
           }
