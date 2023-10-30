@@ -117,7 +117,7 @@ const Home = ({
     onJoin: () => {
       updateMetadata({
         displayName: ens || "Gotilo",
-        avatarUrl: "/4.png" || avatar,
+        avatarUrl: avatar || "/4.png",
       });
     },
     onLeave: async () => {
