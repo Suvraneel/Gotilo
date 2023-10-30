@@ -1,18 +1,12 @@
 import {
-  useLocalAudio,
-  useLocalMedia,
-  useLocalVideo,
-  usePeerIds,
-  useRoom,
-  useHuddle01,
+  usePeerIds
 } from "@huddle01/react/hooks";
-import { FC, useEffect, useState } from "react";
 import clsx from "clsx";
-import VideoElem from "./Video";
-import Image from "next/image";
-import { BasicIcons } from "./BasicIcons";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import { FC } from "react";
 import NameEditor from "./NameEditor";
+import VideoElem from "./Video";
 
 const PeerData = dynamic(() => import("./PeerData"), {
   ssr: false,

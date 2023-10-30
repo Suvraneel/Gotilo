@@ -1,5 +1,4 @@
 import { Menu } from '@headlessui/react';
-// import { useTheme } from 'next-themes';
 import type { FC } from 'react';
 
 type DeviceListProps = {
