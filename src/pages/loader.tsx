@@ -66,7 +66,7 @@ const Loader = () => {
         ) {
           setMatchedRoomId(checkIfRoomExists?.roomId as string);
           setMatchedAddress(checkIfRoomExists?.partner as string);
-          push(`room/${checkIfRoomExists?.roomId}`);
+          push('/itsamatch');
           return;
         }
 
@@ -113,7 +113,7 @@ const Loader = () => {
             console.log("We are still here");
 
             if ((roomId as RoomsInterface).roomId !== null) {
-              push(`/room/${(roomId as RoomsInterface).roomId}`);
+              push(`/itsamatch`);
               return;
             }
           }

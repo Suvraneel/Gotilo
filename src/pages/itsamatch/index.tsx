@@ -8,6 +8,8 @@ import { redis2 } from "@utils/db";
 import { useMeetPersistStore } from "@store/meet";
 import { useMachingStore } from "@store/matching";
 import { useEnsName, useEnsAvatar, useAccount } from "wagmi";
+import { publicClient } from "@utils/client";
+import { normalize } from "viem/ens";
 
 interface RoomsDataInterface {
   roomId: string;
@@ -20,6 +22,8 @@ const ItsAMatch = () => {
   const avatarUrl = useMeetPersistStore((state) => state.avatarUrl);
   const matchedAddress = useMachingStore((state) => state.matchedAddress);
   const roomId = useMachingStore((state) => state.matchedRoomId);
+  const [myAvatar, setMyAvatar] = useState<string | null>(null);
+  const [partnerAvatar, setPartnerAvatar] = useState<string | null>(null);
 
   const { address } = useAccount();
 
@@ -31,16 +35,33 @@ const ItsAMatch = () => {
     address: matchedAddress as `0x${string}`,
   });
 
-  const { data: myEnsAvatar } = useEnsAvatar({
-    name: myEns,
-  });
+  const getMyEnsAvatar = async () => {
+    const ensText = await publicClient.getEnsAvatar({
+      name: normalize(myEns as string),
+    });
+    setMyAvatar(ensText);
+  };
+
+  const getPartnerEnsAvatar = async () => {
+    const ensText = await publicClient.getEnsAvatar({
+      name: normalize(partnerEns as string),
+    });
+    setPartnerAvatar(ensText);
+  }
 
   const { data: partnerEnsAvatar } = useEnsAvatar({
     name: partnerEns,
   });
 
   useEffect(() => {
+
     if (roomId) {
+      if (myEns) {
+        getMyEnsAvatar();
+      }
+      if (partnerEns) {
+        getPartnerEnsAvatar();
+      }
       setTimeout(() => {
         push(`/room/${roomId}`);
       }, 5000);
@@ -56,24 +77,24 @@ const ItsAMatch = () => {
           <div className="flex justify-evenly items-center w-full h-full relative">
             <div className={`w-1/3 aspect-square relative ${styles.animate_left_to_center}`}>
               <Image
-                src={myEnsAvatar ?? "/4.png"}
+                src={myAvatar ?? "/4.png"}
                 loader={({ src }) => src}
                 alt="itsamatch"
                 fill
                 className={`rounded-full bg-cover`}
               />
-              <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">Gotilo</span>
+              <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">{myEns ?? 'Gotilo (You)'}</span>
             </div>
             <h1 className={`text-8xl font-thin ${styles.stamp}`}>X</h1>
             <div className={`w-1/3 aspect-square relative ${styles.animate_right_to_center}`}>
               <Image
-                src={myEnsAvatar ?? "/4.png"}
+                src={partnerAvatar ?? "/4.png"}
                 loader={({ src }) => src}
                 alt="itsamatch"
                 fill
                 className={`rounded-full bg-cover`}
               />
-              <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">Gotilo</span>
+              <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">{partnerEns ?? "Gotilo"}</span>
             </div>
           </div>
           <button
