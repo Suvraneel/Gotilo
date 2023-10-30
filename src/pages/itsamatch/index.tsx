@@ -51,10 +51,6 @@ const ItsAMatch = () => {
     setPartnerAvatar(ensText);
   }
 
-  const { data: partnerEnsAvatar } = useEnsAvatar({
-    name: partnerEns,
-  });
-
   useEffect(() => {
 
     if (roomId) {
@@ -99,13 +95,13 @@ const ItsAMatch = () => {
               <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">{partnerEns ?? "Gotilo"}</span>
             </div>
           </div>
-          <button
+          {/* <button
             type="button"
             className="flex w-40 items-center justify-center rounded-md py-3 text-slate-100 bg-blue-600 group hover:bg-blue-900"
           >
             Start Meeting
             <ArrowRightIcon className="ml-2 h-4 w-4 group-hover:translate-x-2 transition-transform" />
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
