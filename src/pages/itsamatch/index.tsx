@@ -54,24 +54,26 @@ const ItsAMatch = () => {
           <Realistic />
           <h1 className="text-white text-3xl font-bold">It&apos;s a Match!</h1>
           <div className="flex justify-evenly items-center w-full h-full relative">
-            <div className="w-1/3 aspect-square relative">
+            <div className={`w-1/3 aspect-square relative ${styles.animate_left_to_center}`}>
               <Image
-                src={myEnsAvatar || "/4.png"}
+                src={myEnsAvatar ?? "/4.png"}
                 loader={({ src }) => src}
                 alt="itsamatch"
                 fill
-                className={`rounded-full ${styles.animate_left_to_center} bg-cover`}
+                className={`rounded-full bg-cover`}
               />
+              <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">Gotilo</span>
             </div>
             <h1 className={`text-8xl font-thin ${styles.stamp}`}>X</h1>
-            <div className="w-1/3 aspect-square relative">
+            <div className={`w-1/3 aspect-square relative ${styles.animate_right_to_center}`}>
               <Image
-                src={myEnsAvatar || "/4.png"}
+                src={myEnsAvatar ?? "/4.png"}
                 loader={({ src }) => src}
                 alt="itsamatch"
                 fill
-                className={`rounded-full ${styles.animate_right_to_center} bg-cover`}
+                className={`rounded-full bg-cover`}
               />
+              <span className="w-full flex justify-center items-center absolute -bottom-8 text-xl font-semibold">Gotilo</span>
             </div>
           </div>
           <button
