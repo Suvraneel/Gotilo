@@ -15,6 +15,8 @@ interface MeetPersistState {
   setAvatarUrl: (avatarUrl: string) => void;
   displayName: string;
   setDisplayName: (displayName: string) => void;
+  isMatched: boolean;
+  setIsMatched: (isMatched: boolean) => void;
 }
 
 export const useMeetPersistStore = create<MeetPersistState>((set) => ({
@@ -33,4 +35,6 @@ export const useMeetPersistStore = create<MeetPersistState>((set) => ({
   setAvatarUrl: (avatarUrl) => set(() => ({ avatarUrl })),
   displayName: '',
   setDisplayName: (displayName) => set(() => ({ displayName })),
+  isMatched: false,
+  setIsMatched: (isMatched) => set(() => ({ isMatched })),
 }));

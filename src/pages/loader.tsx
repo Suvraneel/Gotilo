@@ -28,6 +28,8 @@ const Loader = () => {
   const { address } = useAccount();
   const { push } = useRouter();
   const setAvatarUrl = useMeetPersistStore((state) => state.setAvatarUrl);
+  const isMatched = useMeetPersistStore((state) => state.isMatched);
+  const setisMatched = useMeetPersistStore((state) => state.setIsMatched);
 
   const getPreferredMatchNFT = async (preferences: string[]) => {
     let maxPreference: string | null = null;
@@ -53,7 +55,7 @@ const Loader = () => {
     }
     console.log("Preferred Match NFT Collection is", preferredMatchNFT);
     if (preferredMatchNFT) {
-      let isMatched = false;
+      let isMatch = false;
       let counter = 0;
       const startMatching = async () => {
         const checkIfRoomExists = (await redis2.get(
@@ -62,11 +64,13 @@ const Loader = () => {
 
         if (
           checkIfRoomExists?.partner !== null &&
-          checkIfRoomExists?.roomId !== null
+          checkIfRoomExists?.roomId !== null &&
+          !isMatched
         ) {
           setMatchedRoomId(checkIfRoomExists?.roomId as string);
           setMatchedAddress(checkIfRoomExists?.partner as string);
           push('/itsamatch');
+          setisMatched(true);
           return;
         }
 
@@ -78,11 +82,11 @@ const Loader = () => {
           (item) => item !== address
         );
 
-        if (availablePartners) {
+        if (availablePartners && !isMatched) {
           const roomPartner = availablePartners[0];
 
           if (roomPartner) {
-            isMatched = true;
+            isMatch = true;
 
             setMatchedAddress(roomPartner);
 
@@ -114,6 +118,7 @@ const Loader = () => {
 
             if ((roomId as RoomsInterface).roomId !== null) {
               push(`/itsamatch`);
+              setisMatched(true);
               return;
             }
           }
@@ -124,7 +129,7 @@ const Loader = () => {
 
       if (counter < 5) {
         setInterval(() => {
-          if (!isMatched) {
+          if (!isMatch) {
             startMatching();
             counter++;
             console.log(`Testing for ${counter} times`);
