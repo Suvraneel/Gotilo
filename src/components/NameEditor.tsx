@@ -52,7 +52,7 @@ const NameEditor: React.FC<Props> = ({ displayName }) => {
   };
 
   return (
-    <div className="flex w-full flex-shrink text-slate-100 absolute bottom-1 left-1 rounded-md py-1 px-2 font-lg gap-2 justify-start items-center">
+    <div className="flex w-fit bg-black flex-shrink text-slate-100 absolute bottom-1 left-1 rounded-md py-1 px-2 font-lg gap-2 justify-start items-center">
       {isEditing ? (
         <div className="flex w-fit justify-start items-center">
           <input

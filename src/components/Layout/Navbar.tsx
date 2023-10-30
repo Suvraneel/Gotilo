@@ -43,10 +43,10 @@ export default function Navbar() {
               <LogoSquare className='w-5 h-5 relative p-2'/>
               <div className="ml-2 flex-none text-sm font-medium uppercase md:hidden lg:block p-2">
                 {/* {process.env.SITE_NAME} */}
-                SuperMeets
+                GoTilo
               </div>
             </Link>
-            {menu.length!=0 && (
+            {/* {menu.length!=0 && (
               <ul className="hidden gap-6 text-sm md:flex md:items-center">
                 {menu.map((item) => (
                   <li key={item.title}>
@@ -59,7 +59,7 @@ export default function Navbar() {
                   </li>
                 ))}
               </ul>
-            )}
+            )} */}
           </div>
           <div className="flex justify-end md:w-1/3">
             <ConnectKitButton/>
